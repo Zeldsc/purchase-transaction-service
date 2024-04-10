@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: purchase-transaction-service
+  datasource:
+    url: jdbc:postgresql://purchase_postgres_db:5432/purchase
+    username: pts_sys_user
+    password: pts_sys_user
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 5
+  jpa:
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+
+  http:
+    converters:
+      preferred-json-mapper: gson
+
+  gson:
+    disable-html-escaping: true
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health
+  health:
+    circuitbreakers:
+      enabled: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      ratesExchange:
+        slidingWindowType: COUNT_BASED
+        registerHealthIndicator: true
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 10
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 60s
+        permittedNumberOfCallsInHalfOpenState: 3

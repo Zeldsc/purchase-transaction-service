@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  purchase_postgres_db:
+    image: postgres:latest
+    container_name: purchase_postgres_db
+    networks:
+      - network
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: purchase
+      POSTGRES_USER: pts_sys_user
+      POSTGRES_PASSWORD: pts_sys_user
+      POSTGRES_ADMIN_USER: pts_sys_adm
+      POSTGRES_ADMIN_PASSWORD: pts_sys_adm
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+  purchase-transaction-service:
+    build: .
+    image: purchase-transaction-service:latest
+    container_name: purchase-transaction-service
+    ports:
+      - 8080:8080
+    depends_on:
+      - "purchase_postgres_db"
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge
